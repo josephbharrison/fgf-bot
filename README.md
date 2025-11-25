@@ -1,4 +1,6 @@
-FGF NAP/PvP Enforcement Bot
+## Discord Bot - Foundation Galactic Frontier
+
+NAP/PvP enforcement, administration, and member assistance.
 
 A self-hosted Discord bot for Foundation: Galactic Frontier guilds.
 
