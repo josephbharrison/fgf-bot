@@ -1,0 +1,27 @@
+{
+  "name": "fgf-bot",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/bot.js",
+    "dev": "ts-node src/bot.ts",
+    "register": "ts-node src/registerCommands.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Foundation Galatic Frontier - Discord Bot",
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.2.3",
+    "jszip": "^3.10.1",
+    "node-fetch": "^3.3.2",
+    "openai": "^6.9.1"
+  }
+}
