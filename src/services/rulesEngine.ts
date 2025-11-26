@@ -1,3 +1,4 @@
+// services/rulesEngine.ts
 import { getPvpConfig } from "./store";
 import { BattleReportRaw, ViolationReason, ViolationResult } from "../types";
 

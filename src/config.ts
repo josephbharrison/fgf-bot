@@ -1,3 +1,4 @@
+// config.ts
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -11,6 +12,11 @@ export interface BotConfig {
   dataFilePath: string;
   openaiApiKey: string;
   ocrModel: string;
+  napMembersDefault: string[];
+  napRulesDefault: string[];
+  seedGuildsDefault: string[];
+  warZonesDefault: string[];
+  includeWarZones: boolean;
 }
 
 function requireEnv(name: string): string {
@@ -19,6 +25,14 @@ function requireEnv(name: string): string {
     throw new Error(`Missing env var ${name}`);
   }
   return value;
+}
+
+function parseCsvEnv(name: string): string[] {
+  const raw = process.env[name] || "";
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 export const config: BotConfig = {
@@ -33,23 +47,14 @@ export const config: BotConfig = {
   dataFilePath: process.env.DATA_FILE_PATH || "data.json",
   openaiApiKey: requireEnv("OPENAI_API_KEY"),
   ocrModel: process.env.OCR_MODEL || "gpt-4o-mini",
+  napMembersDefault: parseCsvEnv("NAP_MEMBERS"),
+  napRulesDefault: parseCsvEnv("NAP_RULES"),
+  seedGuildsDefault: parseCsvEnv("SEED_GUILDS"),
+  warZonesDefault: parseCsvEnv("WAR_ZONES"),
+  includeWarZones:
+    process.env.INCLUDE_WAR_ZONES === undefined
+      ? true
+      : ["true", "1", "yes"].includes(
+        process.env.INCLUDE_WAR_ZONES.toLowerCase(),
+      ),
 };
-
-const defaultNapMembers = ["SP", "SP2", "BA", "HKA", "IFR2"];
-
-export const NAP_MEMBERS: string[] = (process.env.NAP_MEMBERS ||
-  defaultNapMembers.join(","))!
-  .split(",")
-  .map((s) => s.trim())
-  .filter(Boolean);
-
-const defaultNapRules = [
-  "Attacking trade ships is prohibited.",
-  "Attacking IFR2 is prohibited.",
-];
-
-export const NAP_RULES: string[] = process.env.NAP_RULES
-  ? process.env.NAP_RULES.split("|")
-    .map((s) => s.trim())
-    .filter(Boolean)
-  : defaultNapRules;

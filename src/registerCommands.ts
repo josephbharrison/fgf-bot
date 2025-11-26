@@ -1,3 +1,4 @@
+// registerCommands.ts
 import { REST, Routes } from "discord.js";
 import { config } from "./config";
 import { reportCommand } from "./commands/report";

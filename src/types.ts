@@ -1,3 +1,4 @@
+// types.ts
 export type BattleType =
   | "fleet_vs_fleet"
   | "fleet_vs_base"
@@ -49,6 +50,11 @@ export interface PvpConfig {
   startUtc: string | null;
   endUtc: string | null;
   allowedSystems: string[];
+  napMembers?: string[];
+  napRules?: string[];
+  seedGuilds?: string[];
+  warZones?: string[];
+  includeWarZones?: boolean;
 }
 
 export interface DataFile {

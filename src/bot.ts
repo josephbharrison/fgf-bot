@@ -1,3 +1,4 @@
+// bot.ts
 import { Client, GatewayIntentBits, Interaction, Partials } from "discord.js";
 import { config } from "./config";
 import { handleReportButton, handleReportCommand } from "./commands/report";

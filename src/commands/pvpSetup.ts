@@ -1,3 +1,4 @@
+// commands/pvpSetup.ts
 import {
   ChatInputCommandInteraction,
   SlashCommandBuilder,
@@ -9,7 +10,7 @@ import { config } from "../config";
 
 function getNextWeekendUtc() {
   const now = new Date();
-  const day = now.getUTCDay(); // 0 = Sun, 6 = Sat
+  const day = now.getUTCDay();
 
   const daysToSaturday = (6 - day + 7) % 7 || 7;
   const saturday = new Date(
@@ -42,6 +43,26 @@ function getNextWeekendUtc() {
   };
 }
 
+function parseCsv(input: string | null | undefined): string[] {
+  if (!input) return [];
+  return input
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function dedupe(list: string[]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const item of list) {
+    if (!seen.has(item)) {
+      seen.add(item);
+      result.push(item);
+    }
+  }
+  return result;
+}
+
 export const pvpSetupCommand = new SlashCommandBuilder()
   .setName("pvp-setup")
   .setDescription("Configure the PvP window and allowed systems")
@@ -55,17 +76,31 @@ export const pvpSetupCommand = new SlashCommandBuilder()
   .addStringOption((opt) =>
     opt
       .setName("start_utc")
-      .setDescription(
-        "Start UTC (ISO). Optional — defaults to next Saturday 00:00 UTC",
-      )
+      .setDescription("Start UTC (ISO). Optional")
       .setRequired(false),
   )
   .addStringOption((opt) =>
     opt
       .setName("end_utc")
-      .setDescription(
-        "End UTC (ISO). Optional — defaults to end of next Sunday",
-      )
+      .setDescription("End UTC (ISO). Optional")
+      .setRequired(false),
+  )
+  .addStringOption((opt) =>
+    opt
+      .setName("nap_members")
+      .setDescription("Protected NAP members (comma-separated)")
+      .setRequired(false),
+  )
+  .addStringOption((opt) =>
+    opt
+      .setName("nap_rules")
+      .setDescription("NAP rules or notes (comma-separated)")
+      .setRequired(false),
+  )
+  .addStringOption((opt) =>
+    opt
+      .setName("seed_guilds")
+      .setDescription("Seed guilds never valid to attack (comma-separated)")
       .setRequired(false),
   );
 
@@ -83,6 +118,9 @@ export async function handlePvpSetupCommand(
   const suppliedStartUtc = interaction.options.getString("start_utc", false);
   const suppliedEndUtc = interaction.options.getString("end_utc", false);
   const systemsRaw = interaction.options.getString("systems", true);
+  const napMembersRaw = interaction.options.getString("nap_members", false);
+  const napRulesRaw = interaction.options.getString("nap_rules", false);
+  const seedGuildsRaw = interaction.options.getString("seed_guilds", false);
 
   const { startUtc: defaultStartUtc, endUtc: defaultEndUtc } =
     getNextWeekendUtc();
@@ -100,24 +138,64 @@ export async function handlePvpSetupCommand(
     return;
   }
 
-  const systems = systemsRaw
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const baseSystems = parseCsv(systemsRaw);
+
+  const systemsWithWarZones = config.includeWarZones
+    ? dedupe([...baseSystems, ...config.warZonesDefault])
+    : dedupe(baseSystems);
+
+  const baseNapMembers =
+    napMembersRaw !== null && napMembersRaw !== undefined
+      ? parseCsv(napMembersRaw)
+      : config.napMembersDefault;
+
+  const baseNapRules =
+    napRulesRaw !== null && napRulesRaw !== undefined
+      ? parseCsv(napRulesRaw)
+      : config.napRulesDefault;
+
+  const baseSeedGuilds =
+    seedGuildsRaw !== null && seedGuildsRaw !== undefined
+      ? parseCsv(seedGuildsRaw)
+      : config.seedGuildsDefault;
+
+  const seedGuilds = dedupe(baseSeedGuilds);
+
+  const napMembers = dedupe([...baseNapMembers, ...seedGuilds]);
+
+  const napRules = dedupe(baseNapRules);
 
   const cfg: PvpConfig = {
     active: true,
     startUtc,
     endUtc,
-    allowedSystems: systems,
+    allowedSystems: systemsWithWarZones,
+    napMembers,
+    napRules,
+    seedGuilds,
   };
 
   upsertPvpConfig(cfg);
 
+  const lines: string[] = [];
+  lines.push("PvP configuration updated.");
+  lines.push(`Start: ${startUtc}`);
+  lines.push(`End: ${endUtc}`);
+  lines.push(
+    `Systems: ${systemsWithWarZones.length > 0 ? systemsWithWarZones.join(", ") : "None"}`,
+  );
+  if (napMembers.length > 0) {
+    lines.push(`Protected NAP Members: ${napMembers.join(", ")}`);
+  }
+  if (seedGuilds.length > 0) {
+    lines.push(`Seed Guilds: ${seedGuilds.join(", ")}`);
+  }
+  if (napRules.length > 0) {
+    lines.push(`NAP Rules: ${napRules.join("; ")}`);
+  }
+
   await interaction.reply({
-    content:
-      "PvP configuration updated.\n" +
-      `Start: ${startUtc}\nEnd: ${endUtc}\nSystems: ${systems.join(", ")}`,
+    content: lines.join("\n"),
     ephemeral: true,
   });
 }

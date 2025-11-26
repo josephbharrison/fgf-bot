@@ -1,3 +1,4 @@
+// commands/report.ts
 import {
   ActionRowBuilder,
   Attachment,
