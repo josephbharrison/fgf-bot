@@ -6,6 +6,7 @@ import { handleReportSummaryCommand } from "./commands/reportSummary";
 import { handlePvpCommand } from "./commands/pvp";
 import { handlePvpPreviewCommand } from "./commands/pvpPreview";
 import { handlePvpSetupCommand } from "./commands/pvpSetup";
+import { handleAiCommand } from "./commands/ai";
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds],
@@ -19,16 +20,27 @@ client.once("clientReady", () => {
 client.on("interactionCreate", async (interaction: Interaction) => {
   try {
     if (interaction.isChatInputCommand()) {
-      if (interaction.commandName === "report") {
-        await handleReportCommand(interaction, config.pvpChannelId);
-      } else if (interaction.commandName === "report-summary") {
-        await handleReportSummaryCommand(interaction);
-      } else if (interaction.commandName === "pvp") {
-        await handlePvpCommand(interaction);
-      } else if (interaction.commandName === "pvp-preview") {
-        await handlePvpPreviewCommand(interaction);
-      } else if (interaction.commandName === "pvp-setup") {
-        await handlePvpSetupCommand(interaction);
+      switch (interaction.commandName) {
+        case "report":
+          await handleReportCommand(interaction, config.pvpChannelId);
+          break;
+        case "report-summary":
+          await handleReportSummaryCommand(interaction);
+          break;
+        case "pvp":
+          await handlePvpCommand(interaction);
+          break;
+        case "pvp-preview":
+          await handlePvpPreviewCommand(interaction);
+          break;
+        case "pvp-setup":
+          await handlePvpSetupCommand(interaction);
+          break;
+        case "ai":
+          await handleAiCommand(interaction);
+          break;
+        default:
+          break;
       }
     } else if (interaction.isButton()) {
       await handleReportButton(interaction);

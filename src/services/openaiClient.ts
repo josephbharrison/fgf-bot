@@ -64,3 +64,29 @@ export async function extractBattleReportFromImage(
 
   return parsed as BattleReportRaw;
 }
+
+export async function askAi(prompt: string): Promise<string> {
+  const response = await openai.responses.create({
+    model: config.ocrModel,
+    input: [
+      {
+        role: "system",
+        content:
+          "You are a helpful assistant for a NAP/PvP coordination bot on Discord. " +
+          "Answer clearly and concisely.",
+      },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+    max_output_tokens: 512,
+  });
+
+  const text = response.output_text;
+  if (!text || typeof text !== "string") {
+    throw new Error("No text output returned from model");
+  }
+
+  return text.trim();
+}

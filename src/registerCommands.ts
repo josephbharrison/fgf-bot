@@ -6,6 +6,7 @@ import { reportSummaryCommand } from "./commands/reportSummary";
 import { pvpCommand } from "./commands/pvp";
 import { pvpPreviewCommand } from "./commands/pvpPreview";
 import { pvpSetupCommand } from "./commands/pvpSetup";
+import { aiCommand } from "./commands/ai";
 
 async function main() {
   const rest = new REST({ version: "10" }).setToken(config.discordToken);
@@ -16,6 +17,7 @@ async function main() {
     pvpCommand,
     pvpPreviewCommand,
     pvpSetupCommand,
+    aiCommand,
   ].map((c) => c.toJSON());
 
   if (config.guildId) {
