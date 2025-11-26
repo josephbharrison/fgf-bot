@@ -100,7 +100,7 @@ export const pvpSetupCommand = new SlashCommandBuilder()
   .addStringOption((opt) =>
     opt
       .setName("seed_guilds")
-      .setDescription("Seed guilds never valid to attack (comma-separated)")
+      .setDescription("Our seed guilds (comma-separated)")
       .setRequired(false),
   );
 
