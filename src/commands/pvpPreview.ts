@@ -1,13 +1,12 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { getPvpConfig } from "../services/store";
 import { buildPvpActiveMessage } from "../utils/pvpActive";
-import { buildPvpInactiveMessage } from "../utils/pvpInactive";
 
-export const pvpCommand = new SlashCommandBuilder()
-  .setName("pvp")
-  .setDescription("Show current or next PvP engagement rules");
+export const pvpPreviewCommand = new SlashCommandBuilder()
+  .setName("pvp-preview")
+  .setDescription("Show the configured NAP/PvP window and rules");
 
-export async function handlePvpCommand(
+export async function handlePvpPreviewCommand(
   interaction: ChatInputCommandInteraction,
 ): Promise<void> {
   const cfg = getPvpConfig();
@@ -34,13 +33,15 @@ export async function handlePvpCommand(
 
   const inWindow = now >= start && now <= end;
 
-  const content = inWindow
-    ? buildPvpActiveMessage(cfg, now, {
-      isActive: true,
-      title: "NAP-PvP is active.",
-      includeWindowTimes: false,
-    })
-    : buildPvpInactiveMessage(cfg, now);
+  const title = inWindow
+    ? "Current NAP-PvP window"
+    : "Next configured NAP-PvP window";
+
+  const content = buildPvpActiveMessage(cfg, now, {
+    isActive: inWindow,
+    title,
+    includeWindowTimes: true,
+  });
 
   await interaction.reply({
     content,

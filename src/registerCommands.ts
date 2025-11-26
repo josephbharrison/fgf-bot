@@ -4,6 +4,7 @@ import { config } from "./config";
 import { reportCommand } from "./commands/report";
 import { reportSummaryCommand } from "./commands/reportSummary";
 import { pvpCommand } from "./commands/pvp";
+import { pvpPreviewCommand } from "./commands/pvpPreview";
 import { pvpSetupCommand } from "./commands/pvpSetup";
 
 async function main() {
@@ -13,6 +14,7 @@ async function main() {
     reportCommand,
     reportSummaryCommand,
     pvpCommand,
+    pvpPreviewCommand,
     pvpSetupCommand,
   ].map((c) => c.toJSON());
 

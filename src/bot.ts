@@ -4,6 +4,7 @@ import { config } from "./config";
 import { handleReportButton, handleReportCommand } from "./commands/report";
 import { handleReportSummaryCommand } from "./commands/reportSummary";
 import { handlePvpCommand } from "./commands/pvp";
+import { handlePvpPreviewCommand } from "./commands/pvpPreview";
 import { handlePvpSetupCommand } from "./commands/pvpSetup";
 
 const client = new Client({
@@ -24,6 +25,8 @@ client.on("interactionCreate", async (interaction: Interaction) => {
         await handleReportSummaryCommand(interaction);
       } else if (interaction.commandName === "pvp") {
         await handlePvpCommand(interaction);
+      } else if (interaction.commandName === "pvp-preview") {
+        await handlePvpPreviewCommand(interaction);
       } else if (interaction.commandName === "pvp-setup") {
         await handlePvpSetupCommand(interaction);
       }
