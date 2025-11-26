@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { getPvpConfig } from "../services/store";
-import { buildPvpActiveMessage } from "../utils/pvpActive";
+import { buildPvpActiveMessage } from "../discord/pvpActive";
 
 export const pvpPreviewCommand = new SlashCommandBuilder()
   .setName("pvp-preview")

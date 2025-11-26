@@ -1,11 +1,11 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { getPvpConfig } from "../services/store";
-import { buildPvpActiveMessage } from "../utils/pvpActive";
-import { buildPvpInactiveMessage } from "../utils/pvpInactive";
+import { buildPvpActiveMessage } from "../discord/pvpActive";
+import { buildPvpInactiveMessage } from "../discord/pvpInactive";
 
 export const pvpCommand = new SlashCommandBuilder()
   .setName("pvp")
-  .setDescription("Show current or next PvP engagement rules");
+  .setDescription("Show current PvP status and engagement rules");
 
 export async function handlePvpCommand(
   interaction: ChatInputCommandInteraction,
