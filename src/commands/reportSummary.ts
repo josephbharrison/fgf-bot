@@ -81,9 +81,28 @@ export async function handleReportSummaryCommand(
 
 function userHasOfficerRole(interaction: ChatInputCommandInteraction): boolean {
   const member = interaction.member;
-  if (!member || !("roles" in member)) return false;
-  const roles = member.roles as any;
-  return config.officerRoleIds.some((roleId: string) =>
-    roles.cache.has(roleId),
+  if (!member) return false;
+
+  const officerRoleIds = config.officerRoleIds;
+  if (officerRoleIds.length === 0) return false;
+
+  const isGuildOwner = interaction.guild?.ownerId === interaction.user.id;
+  const hasManageGuild = !!interaction.memberPermissions?.has(
+    PermissionFlagsBits.ManageGuild,
   );
+
+  let memberRoleIds: string[] = [];
+  const anyMember: any = member;
+
+  if (Array.isArray(anyMember.roles)) {
+    memberRoleIds = anyMember.roles as string[];
+  } else if (anyMember.roles && anyMember.roles.cache) {
+    memberRoleIds = Array.from(anyMember.roles.cache.keys());
+  }
+
+  const hasOfficerRole = memberRoleIds.some((id) =>
+    officerRoleIds.includes(id),
+  );
+
+  return isGuildOwner || hasManageGuild || hasOfficerRole;
 }
