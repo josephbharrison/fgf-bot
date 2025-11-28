@@ -4,6 +4,8 @@ import { Agent, run } from "@openai/agents";
 import { config } from "../config";
 import { BattleReportRaw } from "../types";
 import { pvpStatusTool } from "../gpt/pvp";
+import { pvpPreviewTool } from "../gpt/pvpPreview";
+import { pvpPreviewCommand } from "../commands/pvpPreview";
 
 const openai = new OpenAI({
   apiKey: config.openaiApiKey,
@@ -71,11 +73,11 @@ const napPvpAgent = new Agent({
   name: "NAP-PvP Assistant",
   instructions:
     "You are a helpful assistant for a NAP/PvP coordination bot on Discord. " +
-    "Use the pvp_status tool whenever you need to know the current NAP-PvP window, " +
-    "allowed systems, protected NAP members, or rules, and base your answers on its JSON result. " +
-    "Explain clearly what is allowed or forbidden for the player.",
+    "Use the pvp_status tool whenever you need to know what is allowed or forbidden RIGHT NOW (current NAP-PvP status). " +
+    "Use the pvp_preview tool whenever the user asks about the upcoming or configured NAP-PvP window and its rules. " +
+    "Always base your answers strictly on the JSON returned by these tools.",
   model: config.ocrModel,
-  tools: [pvpStatusTool],
+  tools: [pvpStatusTool, pvpPreviewTool],
 });
 
 export async function askAi(prompt: string): Promise<string> {
