@@ -34,8 +34,8 @@ export async function handlePvpPreviewCommand(
   const inWindow = now >= start && now <= end;
 
   const title = inWindow
-    ? "Current NAP-PvP window"
-    : "Next configured NAP-PvP window";
+    ? "Current NAP-PvP window:"
+    : "Next configured NAP-PvP window:";
 
   const content = buildPvpActiveMessage(cfg, now, {
     isActive: inWindow,

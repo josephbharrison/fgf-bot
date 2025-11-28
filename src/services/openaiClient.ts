@@ -1,7 +1,9 @@
 // services/openaiClient.ts
 import OpenAI from "openai";
+import { Agent, run } from "@openai/agents";
 import { config } from "../config";
 import { BattleReportRaw } from "../types";
+import { pvpStatusTool } from "../gpt/pvp";
 
 const openai = new OpenAI({
   apiKey: config.openaiApiKey,
@@ -65,28 +67,23 @@ export async function extractBattleReportFromImage(
   return parsed as BattleReportRaw;
 }
 
-export async function askAi(prompt: string): Promise<string> {
-  const response = await openai.responses.create({
-    model: config.ocrModel,
-    input: [
-      {
-        role: "system",
-        content:
-          "You are a helpful assistant for a NAP/PvP coordination bot on Discord. " +
-          "Answer clearly and concisely.",
-      },
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-    max_output_tokens: 512,
-  });
+const napPvpAgent = new Agent({
+  name: "NAP-PvP Assistant",
+  instructions:
+    "You are a helpful assistant for a NAP/PvP coordination bot on Discord. " +
+    "Use the pvp_status tool whenever you need to know the current NAP-PvP window, " +
+    "allowed systems, protected NAP members, or rules, and base your answers on its JSON result. " +
+    "Explain clearly what is allowed or forbidden for the player.",
+  model: config.ocrModel,
+  tools: [pvpStatusTool],
+});
 
-  const text = response.output_text;
-  if (!text || typeof text !== "string") {
-    throw new Error("No text output returned from model");
+export async function askAi(prompt: string): Promise<string> {
+  const result = await run(napPvpAgent, prompt);
+
+  if (!result.finalOutput) {
+    throw new Error("No final output returned from AI");
   }
 
-  return text.trim();
+  return result.finalOutput;
 }
