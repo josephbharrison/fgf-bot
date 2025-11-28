@@ -5,7 +5,6 @@ import { config } from "../config";
 import { BattleReportRaw } from "../types";
 import { pvpStatusTool } from "../gpt/pvp";
 import { pvpPreviewTool } from "../gpt/pvpPreview";
-import { pvpPreviewCommand } from "../commands/pvpPreview";
 
 const openai = new OpenAI({
   apiKey: config.openaiApiKey,
